@@ -11,8 +11,13 @@ void ft_putchar(char *str, int *len)
 void ft_putnum(long long num, int base, int *len)
 {
     char *hex = "0123456789abcdef";
-    if (num < 0) {*len += write(1, "-", 1); num = -num;}
-    if (num >= base) ft_putnum(num / base, base, len);
+    if (num < 0) 
+    {
+        *len += write(1, "-", 1);
+        num = -num;
+    }
+    if (num >= base) 
+        ft_putnum(num / base, base, len);
     *len += write(1, &hex[num % base], 1);
 }
 void print_loop(const char *f,  va_list ap, int *len)
@@ -22,9 +27,12 @@ void print_loop(const char *f,  va_list ap, int *len)
         if (*f == '%' && (*(f + 1) == 's' || *(f + 1) == 'd' ||  *(f + 1) == 'x'))
         {
             f++;
-            if (*f == 's') ft_putchar(va_arg(ap, char *), len);
-            else if (*f == 'd') ft_putnum(va_arg(ap, int), 10, len);
-            else if (*f == 'x') ft_putnum(va_arg(ap, unsigned int), 16, len);
+            if (*f == 's') 
+                ft_putchar(va_arg(ap, char *), len);
+            else if (*f == 'd') 
+                ft_putnum(va_arg(ap, int), 10, len);
+            else if (*f == 'x') 
+                ft_putnum(va_arg(ap, unsigned int), 16, len);
         }
         else
             *len += write(1, f, 1);
