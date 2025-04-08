@@ -62,32 +62,90 @@ char    *ft_strjoin(char *s1,char *s2)
     free(s1);
     return (join);
 }
-char    *get_next_line(int fd)
+/**
+ * get_next_line - Reads a line from a file descriptor
+ * @param fd: The file descriptor to read from
+ * @return: The line read (including newline if present), or NULL if EOF/error
+ *
+ * This function reads a line from a file descriptor and returns it as a dynamically
+ * allocated string. It uses a static buffer to store leftovers between calls.
+ */
+char *get_next_line(int fd)
 {
-    static char buf[BUFFER_SIZE + 1];
-    char        *line;
-    char        *newline;
-    int         countread;
-    int         to_copy;
+    static char buf[BUFFER_SIZE + 1];  // Static buffer persists between function calls
+    char        *line;                 // Will hold the line to return
+    char        *newline;              // Pointer to newline character if found
+    int         countread;             // Number of bytes read
+    int         to_copy;               // Number of bytes to include in final line
 
-    line = ft_strdup(buf);
+    // STEP 1: Initialize our line with any leftover content from previous calls
+    line = ft_strdup(buf);  // Create a duplicate of the static buffer
+    
+    // STEP 2: Keep reading until we either find a newline or reach EOF
     while (!(newline = ft_strchr(line, '\n')) && (countread = read(fd, buf, BUFFER_SIZE)))
     { 
+        // Null-terminate what we just read
         buf[countread] = '\0';
+        
+        // Join the new data to our existing line (with memory management)
         line = ft_strjoin(line, buf);
     }
+    
+    // STEP 3: Handle empty line case (EOF with nothing to return)
     if (ft_strlen(line) == 0) 
-        return (free(line), NULL);
-    if (newline != NULL)
+        return (free(line), NULL);  // Free memory and return NULL
+    
+    // STEP 4: Process the line based on whether a newline was found
+    if (newline != NULL)  // Newline found
     {
-        to_copy = newline - line + 1; 
+        // Calculate length including the newline character
+        to_copy = newline - line + 1;
+        
+        // Save everything after the newline for the next call
         ft_strcpy(buf, newline + 1);
     }
-    else
+    else  // No newline found (end of file)
     {
+        // Use the entire string
         to_copy = ft_strlen(line);
+        
+        // Clear the static buffer
         buf[0] = '\0';
     }
+    
+    // STEP 5: Finalize the line by adding null terminator at proper position
     line[to_copy] = '\0';
+    
+    // STEP 6: Return the completed line
     return (line);
 }
+
+// char    *get_next_line(int fd)
+// {
+//     static char buf[BUFFER_SIZE + 1];
+//     char        *line;
+//     char        *newline;
+//     int         countread;
+//     int         to_copy;
+
+//     line = ft_strdup(buf);
+//     while (!(newline = ft_strchr(line, '\n')) && (countread = read(fd, buf, BUFFER_SIZE)))
+//     { 
+//         buf[countread] = '\0';
+//         line = ft_strjoin(line, buf);
+//     }
+//     if (ft_strlen(line) == 0) 
+//         return (free(line), NULL);
+//     if (newline != NULL)
+//     {
+//         to_copy = newline - line + 1; 
+//         ft_strcpy(buf, newline + 1);
+//     }
+//     else
+//     {
+//         to_copy = ft_strlen(line);
+//         buf[0] = '\0';
+//     }
+//     line[to_copy] = '\0';
+//     return (line);
+// }
