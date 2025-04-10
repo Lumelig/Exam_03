@@ -1,6 +1,7 @@
 #include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>
+#include <fcntl.h>
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 42
@@ -130,4 +131,54 @@ char *get_next_line(int fd)
         buf[0] = '\0';
 
     return (line);
+}
+
+int main(int argc, char **argv)
+{
+    int fd;
+    char *line;
+    int line_count = 0;
+    
+    if (argc < 2)
+    {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+    
+    fd = open(argv[1], O_RDONLY);
+    if (fd < 0)
+    {
+        printf("Error opening file: %s\n", argv[1]);
+        return 1;
+    }
+    
+    printf("Reading from file: %s\n", argv[1]);
+    printf("-------------------------\n");
+    
+    while ((line = get_next_line(fd)) != NULL)
+    {
+        line_count++;
+        printf("Line %d: %s", line_count, line);
+        free(line);  // Don't forget to free the line returned by get_next_line
+    }
+    
+    printf("-------------------------\n");
+    printf("Total lines read: %d\n", line_count);
+    
+    close(fd);
+    
+    // Test with standard input
+    printf("\nNow reading from standard input. Type some text (Ctrl+D to end):\n");
+    line_count = 0;
+    
+    while ((line = get_next_line(0)) != NULL)
+    {
+        line_count++;
+        printf("Line %d: %s", line_count, line);
+        free(line);
+    }
+    
+    printf("Total lines read from stdin: %d\n", line_count);
+    
+    return 0;
 }
